@@ -1,2 +1,2 @@
 # GoStudyFirst
-study go,here are some demos
+study go,here are some demos.
