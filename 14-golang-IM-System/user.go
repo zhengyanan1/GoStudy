@@ -53,9 +53,26 @@ func (this *User) Offline(){
 	this.server.BroadCast(this, "已下线")
 }
 
+//
+func (this *User) SendMessage(msg string){
+	this.conn.Write([]byte(msg))
+}
+
 // DoMessage user handle message
 func (this *User) DoMessage(msg string){
-	this.server.BroadCast(this, msg)
+	if msg == "who" {
+	//	查询当前用户列表
+		this.server.mapLock.Lock()
+		for _, user := range this.server.OnlineMap{
+			onlineMsg := "[" + user.Addr + "]" + user.Name + ":" + "在线\n"
+			this.SendMessage(onlineMsg)
+		}
+
+		this.server.mapLock.Unlock()
+
+	} else {
+		this.server.BroadCast(this, msg)
+	}
 }
 
 
