@@ -90,7 +90,7 @@ func (this *Server) Handler(conn net.Conn){
 		select {
 			case <-isLive:
 
-			case <-time.After(time.Second * 10):
+			case <-time.After(time.Second * 300):
 			//		已经超时
 			//	将当前user强制关闭
 			user.SendMessage("你被踢了\n")
