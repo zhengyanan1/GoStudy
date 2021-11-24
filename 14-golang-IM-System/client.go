@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net"
+	"os"
 )
 
 type Client struct {
@@ -32,6 +34,11 @@ func NewClient(serverIp string, serverPort int) *Client{
 	return client
 }
 
+//处理server 回应的消息
+func (client *Client) DealResponse(){
+	io.Copy(os.Stdout, client.conn)
+}
+
 func (client *Client) menu() bool{
 	var flag int
 
@@ -51,6 +58,20 @@ func (client *Client) menu() bool{
 	}
 }
 
+func (client *Client) UpdateName() bool{
+	fmt.Println(">>>>请输入用户名")
+	fmt.Scanln(&client.Name)
+
+	sendMsg := "rename|" + client.Name + "\n"
+	_, err := client.conn.Write([]byte(sendMsg))
+	if err != nil{
+		fmt.Println("conn.Write err:", err)
+		return false
+	}
+
+	return true
+}
+
 func (client *Client) Run(){
 	for client.flag != 0{
 		for client.menu() != true {
@@ -64,7 +85,7 @@ func (client *Client) Run(){
 			fmt.Println("choose 私聊")
 			break
 		case 3:
-			fmt.Println("choose 更新用户名")
+			client.UpdateName()
 			break
 		}
 	}
@@ -90,6 +111,8 @@ func main() {
 		fmt.Println("连接服务器失败...")
 		return
 	}
+	//单独开启一个goroutine去处理server的回执消息
+	go client.DealResponse()
 
 	fmt.Println("连接服务器成功...")
 
