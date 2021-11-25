@@ -72,6 +72,30 @@ func (client *Client) UpdateName() bool{
 	return true
 }
 
+func (client *Client) PublicChat(){
+//	提示用户输入消息
+	var chatMsg string
+	fmt.Println(">>> 请输入聊天内容，exit退出")
+	fmt.Scanln(&chatMsg)
+
+	//	发送消息
+	for chatMsg != "exit"{
+		if len(chatMsg) != 0{
+			sendMsg := chatMsg + "\n"
+			_, err := client.conn.Write([]byte(sendMsg))
+			if err != nil{
+				println("conn Write err:", err)
+				break
+			}
+		}
+
+		chatMsg = ""
+		fmt.Println(">>> 请输入聊天内容，exit退出")
+		fmt.Scanln(&chatMsg)
+	}
+
+}
+
 func (client *Client) Run(){
 	for client.flag != 0{
 		for client.menu() != true {
@@ -79,7 +103,7 @@ func (client *Client) Run(){
 	//	根据不同的模式处理不同的业务
 		switch client.flag {
 		case 1:
-			fmt.Println("choose 公聊")
+			client.PublicChat()
 			break
 		case 2:
 			fmt.Println("choose 私聊")
